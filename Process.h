@@ -4,6 +4,7 @@
 #include <string>
 #include <stdint.h>
 #include <vector>
+#include <fstream>
 
 class Process {
 public:
@@ -13,11 +14,12 @@ public:
   Process(Process &&orig) = delete;
   Process operator=(const Process &orig) = delete;
   Process operator=(Process && orig) = delete;
-
+  
   void Exec();
 private:
   std::vector<uint8_t> mem_ref;
+  std::ifstream process_file;
 
-}
+};
 
 #endif

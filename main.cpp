@@ -11,6 +11,7 @@
  * Created on January 18, 2019, 11:02 AM
  */
 
+#include "Process.h"
 #include <cstdlib>
 
 using namespace std;
@@ -19,7 +20,6 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
-
-    return 0;
+  return 0;
 }
 
