@@ -20,6 +20,8 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
+  Process test("TEST");
+  test.Exec();
   return 0;
 }
 
