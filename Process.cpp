@@ -37,7 +37,7 @@ auto Process::getCommandFunction(std::string command_type){
 
   // Helper lambdas to process the required command
 
-  // TODO implement max memory 
+  // TODO implement max memory
   auto memsize = [this](std::vector<std::string> args) -> bool{
                    uint32_t mem_amount = getDecimal(args[0]);
                    std::vector<uint8_t> newMem(mem_amount,0);
@@ -48,7 +48,6 @@ auto Process::getCommandFunction(std::string command_type){
   // TODO finish implementation,
   // Need to validate comparison vector.
   auto cmp     = [this](std::vector<std::string> args) -> bool{
-                   std::cout << "cmp!!!\n";
                    uint32_t addr1 = getDecimal(args[0]);
                    uint32_t addr2 = getDecimal(args[2]);
                    uint32_t count = getDecimal(args[3]);
@@ -60,20 +59,9 @@ auto Process::getCommandFunction(std::string command_type){
 
                    std::vector<bool> comparison_result(whole_uint8_t,false);
 
-                   std::transform(mem_ref.begin()+addr1,
-                                  mem_ref.begin()+addr1+count,
-                                  mem_ref.begin()+addr2,
-                                  comparison_result.begin(),
-                                  [](uint8_t val1, uint8_t val2){
-                                    return bool(val1^val2);
-                                  });
-
                    auto comapare_remaining_bits =
                      [addr1, addr2, whole_uint8_t, bits_remaining]
                      (std::vector<uint8_t> mem_ref){
-
-                       //std::cout << "comparing " << unsigned(bits_remaining) << " bits!\n";
-
                        uint32_t index1 = addr1+whole_uint8_t+1;
                        uint32_t index2 = addr2+whole_uint8_t+1;
                        auto get_remainder_bits =
@@ -83,6 +71,14 @@ auto Process::getCommandFunction(std::string command_type){
                        uint8_t remainder_bits2 = get_remainder_bits(index2);
                        return (remainder_bits1^remainder_bits2);
                      };
+
+                   std::transform(mem_ref.begin()+addr1,
+                                  mem_ref.begin()+addr1+count,
+                                  mem_ref.begin()+addr2,
+                                  comparison_result.begin(),
+                                  [](uint8_t val1, uint8_t val2){
+                                    return bool(val1^val2);
+                                  });
 
                    if(bits_remaining){
                      comparison_result.push_back(comapare_remaining_bits(mem_ref));
@@ -96,7 +92,6 @@ auto Process::getCommandFunction(std::string command_type){
 
   // TODO roxygen comment
   auto set     = [this](std::vector<std::string> args) -> bool{
-                   std::cout << "set\n";
                    uint32_t addr = getDecimal(args[0]);
                    std::vector<uint8_t> values_decimal(args.size()-2);
                    std::transform(args.begin()+2,
@@ -113,7 +108,6 @@ auto Process::getCommandFunction(std::string command_type){
 
   // TODO roxygen comment
   auto fill    = [this](std::vector<std::string> args) -> bool{
-                   std::cout << "fill\n";
                    uint32_t addr = getDecimal(args[0]);
                    uint8_t value = getDecimal(args[2]);
                    uint32_t count = getDecimal(args[3]);
@@ -146,23 +140,45 @@ auto Process::getCommandFunction(std::string command_type){
                    uint32_t addr = getDecimal(args[0]);
                    uint32_t count = getDecimal(args[2]);
                    uint32_t elements_printed = 0;
+                   // records if a newline needs to be created after
+                   // print_mem.
+                   bool newline_state = false;
+
+                   // helper lambda to print
+                   auto print_mem =
+                     [&elements_printed, &newline_state, addr, count]
+                     (uint8_t value){
+                       // Create the stream to print
+                       std::stringstream stream;
+                       // print the address part if a new line
+                       if(!(elements_printed%16)){
+                         newline_state = true;
+                         stream << std::setfill('0') << std::setw(7)
+                                << std::hex << unsigned(addr+elements_printed)
+                                << ": ";
+                       };
+                       // print the value from memory in hex string
+                       stream << std::setfill('0') << std::setw(2)
+                              << std::hex << unsigned(value);
+                       elements_printed ++;
+                       // print the stream & a newline if appropriate
+                       std::cout << stream.str()
+                                 << ((elements_printed%16 ) ? " " : "");
+                       // print newline, and tell outer function no new line
+                       // needs to be printed if this is the last value
+                       if(!(elements_printed%16)){
+                         newline_state = false;
+                         std::cout << "\n";
+                       };
+                     };
 
                    std::for_each(mem_ref.begin()+addr,
                                  mem_ref.begin()+addr+count,
-                                 [&elements_printed, addr](uint8_t value){
-                                   std::stringstream stream;
-                                   if(!(elements_printed%16)){
-                                     stream << std::setfill('0') << std::setw(7)
-                                            << std::hex << unsigned(addr+elements_printed)
-                                            << ": ";
-                                   };
-                                   stream << std::setfill('0') << std::setw(2)
-                                          << std::hex << unsigned(value);
-                                   elements_printed ++;
-                                   std::cout << stream.str()
-                                             << ((elements_printed%16) ? " " : "\n");
-                                 });
+                                 print_mem
+                                 );
 
+                   // finish newline if necessary
+                   if(newline_state){std::cout << "\n";};
                    return(true);
                  };
 
@@ -199,6 +215,8 @@ void Process::Exec(){
         auto commandFunction = getCommandFunction(command_type);
         commandFunction(args);
       }
+    }else{
+      std::cout << "\n";
     }
   }
 }
