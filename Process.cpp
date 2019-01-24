@@ -45,14 +45,53 @@ auto Process::getCommandFunction(std::string command_type){
                    return(true);
                  };
 
-  // TODO finish implementation
+  // TODO finish implementation,
+  // Need to validate comparison vector.
   auto cmp     = [this](std::vector<std::string> args) -> bool{
-                   std::cout << "cmp\n"; return(true);
+                   std::cout << "cmp!!!\n";
                    uint32_t addr1 = getDecimal(args[0]);
                    uint32_t addr2 = getDecimal(args[2]);
                    uint32_t count = getDecimal(args[3]);
                    uint8_t addr1_value = mem_ref[addr1];
                    uint8_t addr2_value = mem_ref[addr2];
+
+                   uint32_t whole_uint8_t = count/8;
+                   uint8_t bits_remaining = count%8;
+
+                   std::vector<bool> comparison_result(whole_uint8_t,false);
+
+                   std::transform(mem_ref.begin()+addr1,
+                                  mem_ref.begin()+addr1+count,
+                                  mem_ref.begin()+addr2,
+                                  comparison_result.begin(),
+                                  [](uint8_t val1, uint8_t val2){
+                                    return bool(val1^val2);
+                                  });
+
+                   auto comapare_remaining_bits =
+                     [addr1, addr2, whole_uint8_t, bits_remaining]
+                     (std::vector<uint8_t> mem_ref){
+
+                       //std::cout << "comparing " << unsigned(bits_remaining) << " bits!\n";
+
+                       uint32_t index1 = addr1+whole_uint8_t+1;
+                       uint32_t index2 = addr2+whole_uint8_t+1;
+                       auto get_remainder_bits =
+                         [bits_remaining, mem_ref](uint32_t index)
+                         {return(mem_ref[index] >> (8-bits_remaining));};
+                       uint8_t remainder_bits1 = get_remainder_bits(index1);
+                       uint8_t remainder_bits2 = get_remainder_bits(index2);
+                       return (remainder_bits1^remainder_bits2);
+                     };
+
+                   if(bits_remaining){
+                     comparison_result.push_back(comapare_remaining_bits(mem_ref));
+                   }
+
+                   std::for_each(comparison_result.begin(),comparison_result.end(),
+                                 [](bool comp){std::cout<<comp<<" ~\n";});
+
+
                    return true;
                  };
 
@@ -74,13 +113,29 @@ auto Process::getCommandFunction(std::string command_type){
                  };
 
   // TODO implement
-  auto fill    = [this](std::vector<std::string> args) -> bool
-                 {std::cout << "fill\n"; return(true);};
+  auto fill    = [this](std::vector<std::string> args) -> bool{
+                   std::cout << "fill\n";
+                   uint32_t addr = getDecimal(args[0]);
+                   uint8_t value = getDecimal(args[2]);
+                   uint32_t count = getDecimal(args[3]);
 
-  // dup is already a command in the namespace
-  // TODO implement
-  auto dup_    = [this](std::vector<std::string> args) -> bool
-                 {std::cout << "dup\n"; return(true);};
+                   return(true);
+                 };
+
+  // dup is already a command in the namespace, changed to dup_
+  auto dup_    = [this](std::vector<std::string> args) -> bool{
+                   std::cout << "dup\n";
+                   uint32_t src_addr = getDecimal(args[0]);
+                   uint32_t dest_addr = getDecimal(args[2]);
+                   uint32_t count = getDecimal(args[3]);
+
+                   std::transform(mem_ref.begin()+src_addr,
+                                  mem_ref.begin()+src_addr+count,
+                                  mem_ref.begin()+dest_addr,
+                                  [](uint8_t value_decimal){return value_decimal;});
+
+                   return(true);
+                 };
 
   // TODO format this to specific output
   auto print   = [this](std::vector<std::string> args) -> bool{
