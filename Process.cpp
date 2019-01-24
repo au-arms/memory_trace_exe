@@ -6,6 +6,7 @@
 #include <iostream>
 #include <functional>
 #include <map>
+#include <stdint.h>
 
 //Using boost for string splitting,
 //Used for parsing input to get commands
@@ -24,30 +25,38 @@ Process::Process(const std::string &file_name){
   }
 }
 
-// Helper lambdas to process the required command
-// TODO implement mem_ref alteration
-auto memsize = [](std::vector<std::string> args) -> bool
-               {std::cout << "memsize\n"; return(true);};
-
-auto cmp     = [](std::vector<std::string> args) -> bool
-               {std::cout << "cmp\n"; return(true);};
-
-auto set     = [](std::vector<std::string> args) -> bool
-               {std::cout << "set\n"; return(true);};
-
-auto fill    = [](std::vector<std::string> args) -> bool
-               {std::cout << "fill\n"; return(true);};
-
-auto dup_    = [](std::vector<std::string> args) -> bool
-               {std::cout << "dup\n"; return(true);};
-
-auto print   = [](std::vector<std::string> args) -> bool
-               {std::cout << "print\n"; return(true);};
 
 
 // Get a functional of the respective command
 //std::function<bool(std::vector<std::string>)>
 auto Process::getCommandFunction(std::string command_type){
+
+  // Helper lambdas to process the required command
+
+  // TODO implement max memory 
+  auto memsize = [this](std::vector<std::string> args) -> bool{
+                   uint32_t mem_amount = std::stoul(args[0], nullptr, 16);
+                   std::cout << mem_amount << " memsize\n";
+                   std::vector<uint8_t> newMem(mem_amount,0);
+                   this->mem_ref=newMem;
+                   return(true);
+                 };
+
+  auto cmp     = [this](std::vector<std::string> args) -> bool
+                 {std::cout << "cmp\n"; return(true);};
+
+  auto set     = [this](std::vector<std::string> args) -> bool
+                 {std::cout << "set\n"; return(true);};
+
+  auto fill    = [this](std::vector<std::string> args) -> bool
+                 {std::cout << "fill\n"; return(true);};
+
+  // dup is already a command in the namespace
+  auto dup_    = [this](std::vector<std::string> args) -> bool
+                 {std::cout << "dup\n"; return(true);};
+
+  auto print   = [this](std::vector<std::string> args) -> bool
+                 {std::cout << "print\n"; return(true);};
 
   std::map<std::string, std::function<bool(std::vector<std::string>)>> functMap =
     {{"memsize", memsize},
@@ -79,7 +88,6 @@ void Process::Exec(){
         auto commandFunction = getCommandFunction(command_type);
         commandFunction(args);
       }
-
     }
   }
 }

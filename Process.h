@@ -20,7 +20,6 @@ public:
   bool isCode(char* firstCharacter);
 
   std::vector<std::string> getArguments(std::string command);
-  //std::function<bool(std::vector<std::string>)> getCommandFunction(std::string command_type);
   auto getCommandFunction(std::string command_type);
 
 private:
