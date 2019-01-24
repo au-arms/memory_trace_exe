@@ -22,6 +22,7 @@ public:
   std::vector<std::string> getArguments(std::string command);
   auto getCommandFunction(std::string command_type);
 
+  uint32_t getDecimal(std::string hex_string);
 private:
   std::vector<uint8_t> mem_ref;
   std::ifstream process_file;
