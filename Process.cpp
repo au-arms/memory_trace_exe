@@ -56,6 +56,7 @@ auto Process::getCommandFunction(std::string command_type){
                    return true;
                  };
 
+  // TODO roxygen comment
   auto set     = [this](std::vector<std::string> args) -> bool{
                    std::cout << "set\n";
                    uint32_t addr = getDecimal(args[0]);
@@ -69,19 +70,20 @@ auto Process::getCommandFunction(std::string command_type){
                                   values_decimal.end(),
                                   mem_ref.begin()+addr,
                                   [](uint8_t value_decimal){return value_decimal;});
-
                    return(true);
                  };
 
+  // TODO implement
   auto fill    = [this](std::vector<std::string> args) -> bool
                  {std::cout << "fill\n"; return(true);};
 
   // dup is already a command in the namespace
+  // TODO implement
   auto dup_    = [this](std::vector<std::string> args) -> bool
                  {std::cout << "dup\n"; return(true);};
 
+  // TODO format this to specific output
   auto print   = [this](std::vector<std::string> args) -> bool{
-                   std::cout << "print\n";
                    uint32_t addr = getDecimal(args[0]);
                    uint32_t count = getDecimal(args[2]);
 
@@ -91,7 +93,7 @@ auto Process::getCommandFunction(std::string command_type){
                                    stream << std::hex << unsigned(value);
                                    std::cout << stream.str() << " ";
                                  });
-                   
+
                    std::cout << "\n";
 
                    return(true);
@@ -112,12 +114,15 @@ auto Process::getCommandFunction(std::string command_type){
 
 void Process::Exec(){
 
-  std::string command_string;
+  std::string              command_string;
   std::vector<std::string> args;
-  std::string command_type;
+  std::string              command_type;
+  uint32_t                 line_number = 0;
 
   while (std::getline(process_file, command_string)) {
-    // Only parse commands greater than
+    line_number ++;
+    std::cout << line_number << ":";
+    // Only parse commands greater than 0
     if(command_string.length() != 0){
       std::cout << command_string << "\n";
       // Check if line is code
