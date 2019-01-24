@@ -91,7 +91,6 @@ auto Process::getCommandFunction(std::string command_type){
                    std::for_each(comparison_result.begin(),comparison_result.end(),
                                  [](bool comp){std::cout<<comp<<" ~\n";});
 
-
                    return true;
                  };
 
@@ -112,12 +111,17 @@ auto Process::getCommandFunction(std::string command_type){
                    return(true);
                  };
 
-  // TODO implement
+  // TODO roxygen comment
   auto fill    = [this](std::vector<std::string> args) -> bool{
                    std::cout << "fill\n";
                    uint32_t addr = getDecimal(args[0]);
                    uint8_t value = getDecimal(args[2]);
                    uint32_t count = getDecimal(args[3]);
+
+                   std::transform(mem_ref.begin()+addr,
+                                  mem_ref.begin()+addr+count,
+                                  mem_ref.begin()+addr,
+                                  [value](uint8_t old){return value;});
 
                    return(true);
                  };
