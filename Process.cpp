@@ -85,7 +85,9 @@ auto Process::getCommandFunction(std::string command_type){
                    }
 
                    std::for_each(comparison_result.begin(),comparison_result.end(),
-                                 [](bool comp){std::cout<<comp<<" ~\n";});
+                                 [](bool comp){
+                                   if(comp){throw std::runtime_error("CMP CHECK FAIL");};
+                                 });
 
                    return true;
                  };
