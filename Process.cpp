@@ -126,9 +126,9 @@ auto Process::getCommandFunction(std::string command_type){
                    return(true);
                  };
 
+  // TODO roxygen comment
   // dup is already a command in the namespace, changed to dup_
   auto dup_    = [this](std::vector<std::string> args) -> bool{
-                   std::cout << "dup\n";
                    uint32_t src_addr = getDecimal(args[0]);
                    uint32_t dest_addr = getDecimal(args[2]);
                    uint32_t count = getDecimal(args[3]);
@@ -141,19 +141,27 @@ auto Process::getCommandFunction(std::string command_type){
                    return(true);
                  };
 
-  // TODO format this to specific output
+  // TODO roxygen comment
   auto print   = [this](std::vector<std::string> args) -> bool{
                    uint32_t addr = getDecimal(args[0]);
                    uint32_t count = getDecimal(args[2]);
+                   uint32_t elements_printed = 0;
 
-                   std::for_each(mem_ref.begin()+addr,mem_ref.begin()+addr+count,
-                                 [](uint8_t value){
+                   std::for_each(mem_ref.begin()+addr,
+                                 mem_ref.begin()+addr+count,
+                                 [&elements_printed, addr](uint8_t value){
                                    std::stringstream stream;
-                                   stream << std::hex << unsigned(value);
-                                   std::cout << stream.str() << " ";
+                                   if(!(elements_printed%16)){
+                                     stream << std::setfill('0') << std::setw(7)
+                                            << std::hex << unsigned(addr+elements_printed)
+                                            << ": ";
+                                   };
+                                   stream << std::setfill('0') << std::setw(2)
+                                          << std::hex << unsigned(value);
+                                   elements_printed ++;
+                                   std::cout << stream.str()
+                                             << ((elements_printed%16) ? " " : "\n");
                                  });
-
-                   std::cout << "\n";
 
                    return(true);
                  };
