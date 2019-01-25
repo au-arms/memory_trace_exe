@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=Lab2
+PROJECTNAME=memory_trace_exe-master
 
 # Active Configuration
 DEFAULTCONF=Debug
