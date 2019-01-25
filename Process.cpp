@@ -92,6 +92,7 @@ auto Process::getCommandFunction(std::string command_type){
 
                    std::vector<bool> comparison_result(whole_uint8_t,false);
 
+                   // compares incomplete uint8_t records for equality
                    auto comapare_remaining_bits =
                      [addr1, addr2, whole_uint8_t, bits_remaining]
                      (std::vector<uint8_t> mem_ref){
@@ -117,10 +118,32 @@ auto Process::getCommandFunction(std::string command_type){
                      comparison_result.push_back(comapare_remaining_bits(mem_ref));
                    }
 
-                   std::for_each(comparison_result.begin(),comparison_result.end(),
-                                 [](bool comp){
-                                   if(comp){throw std::runtime_error("CMP CHECK FAIL");};
-                                 });
+                   uint32_t index1 = addr1;
+                   uint32_t index2 = addr2;
+
+                   // trivial function for getting correct 0 padded hex string from
+                   // decimal input.
+                   auto getHexString =
+                     [](uint32_t width, uint32_t value) -> std::string{
+                       std::stringstream stream;
+                       stream << std::setfill('0') << std::setw(width)
+                              << std::hex << unsigned(value);
+                       return stream.str();
+                     };
+
+                   using Iter = std::vector<bool>::const_iterator;
+                   for(Iter comp = comparison_result.begin();
+                       comp != comparison_result.end();
+                       comp++, index1++, index2++
+                       ){
+                     if(*comp){
+                       std::cerr << "cmp error, addr1 = "
+                                 << getHexString(7, index1) << ", value = "
+                                 << getHexString(2, mem_ref[index1]) << ", addr2 = "
+                                 << getHexString(7, index2) << ", value = "
+                                 << getHexString(2, mem_ref[index2]);
+                     };
+                   }
 
                    return true;
                  };
@@ -137,7 +160,7 @@ auto Process::getCommandFunction(std::string command_type){
                    uint32_t addr = getDecimal(args[0]);
                    std::vector<uint8_t> values_decimal(args.size()-2);
                    std::transform(args.begin()+2, args.end(),
-                           values_decimal.begin(), 
+                           values_decimal.begin(),
                            [this](std::string value_hex){
                                       return getDecimal(value_hex);
                                   });
@@ -321,7 +344,7 @@ std::vector<std::string> Process::getArguments(std::string command){
   *  Closes the file at the end of the program
   * 
   */
-Process::~Process() {
+virtual Process::~Process() {
     process_file.close();
 }
 
