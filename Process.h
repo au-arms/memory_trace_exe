@@ -32,7 +32,7 @@ public:
     *  Closes the file at the end of the program
     * 
     */
-    virtual ~Process() {}
+    virtual ~Process();
     
     /**
     * Class method

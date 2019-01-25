@@ -28,7 +28,7 @@ int main(int argc, char** argv[]) {
     //    exit(1);
     //}
     
-  Process test(argv[1]);
+  Process test("TEST");
   test.Exec();
   return 0;
 }
