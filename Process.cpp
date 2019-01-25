@@ -118,32 +118,43 @@ auto Process::getCommandFunction(std::string command_type){
                      comparison_result.push_back(comapare_remaining_bits(mem_ref));
                    }
 
-                   uint32_t index1 = addr1;
-                   uint32_t index2 = addr2;
+                   // Really tried to get the CMP failure output out correctly,
+                   // not sure what went wrong with the code but it kept dumping the
+                   // core / memory map & failing... :(
 
-                   // trivial function for getting correct 0 padded hex string from
-                   // decimal input.
-                   auto getHexString =
-                     [](uint32_t width, uint32_t value) -> std::string{
-                       std::stringstream stream;
-                       stream << std::setfill('0') << std::setw(width)
-                              << std::hex << unsigned(value);
-                       return stream.str();
-                     };
+                   // uint32_t index1 = addr1;
+                   // uint32_t index2 = addr2;
+                   // uint32_t comp_index = 0;
+                   // // trivial function for getting correct 0 padded hex string from
+                   // // decimal input.
+                   // auto getHexString =
+                   //   [](uint32_t width, uint32_t value){
+                   //     std::stringstream stream;
+                   //     stream << std::setfill('0') << std::setw(width)
+                   //            << std::hex << unsigned(value);
+                   //     return stream.str();
+                   //   };
 
-                   using Iter = std::vector<bool>::const_iterator;
-                   for(Iter comp = comparison_result.begin();
-                       comp != comparison_result.end();
-                       comp++, index1++, index2++
-                       ){
-                     if(*comp){
-                       std::cerr << "cmp error, addr1 = "
-                                 << getHexString(7, index1) << ", value = "
-                                 << getHexString(2, mem_ref[index1]) << ", addr2 = "
-                                 << getHexString(7, index2) << ", value = "
-                                 << getHexString(2, mem_ref[index2]);
-                     };
-                   }
+                   // for(uint32_t comp_index = 0;
+                   //     comp_index < comparison_result.size();
+                   //     comp_index++, index1++, index2++
+                   //     ){
+                   //   std::cout<< double(comp_index)/comparison_result.size() << " ";
+
+                   //   if(comparison_result[comp_index]){
+                   //     std::cout << "HERE!\n\n";
+                   //     std::cerr << "cmp error, addr1 = "
+                   //               << getHexString(7, index1) << ", value = "
+                   //               << getHexString(2, mem_ref[index1]) << ", addr2 = "
+                   //               << getHexString(7, index2) << ", value = "
+                   //               << getHexString(2, mem_ref[index2]);
+                   //   };
+                   // }
+
+                   std::for_each(comparison_result.begin(),comparison_result.end(),
+                                 [](bool comp){
+                                   if(comp){std::cerr << "CMP CHECK FAIL\n";};
+                                 });
 
                    return true;
                  };
@@ -344,7 +355,7 @@ std::vector<std::string> Process::getArguments(std::string command){
   *  Closes the file at the end of the program
   * 
   */
-virtual Process::~Process() {
+Process::~Process() {
     process_file.close();
 }
 
