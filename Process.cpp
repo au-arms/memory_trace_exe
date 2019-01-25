@@ -333,7 +333,7 @@ std::vector<std::string> Process::getArguments(std::string command){
   *  Closes the file at the end of the program
   * 
   */
-virtual Process::~Process() {
+Process::~Process() {
     process_file.close();
 }
 
