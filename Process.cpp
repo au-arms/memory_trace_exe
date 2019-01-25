@@ -14,6 +14,14 @@
 //instantiates the process_file private variable
 //Opens the file name passed to it
 //TODO full doxygen comment
+/**
+ * Constructor
+ * 
+ * Reads trace file and throws error if it fails. 
+ * 
+ * @param file_name input file
+ * @throws std::runtime_error if file not found or error reading file
+*/
 Process::Process(const std::string &file_name){
   process_file.open(file_name);
   if (process_file.fail()){
@@ -21,28 +29,66 @@ Process::Process(const std::string &file_name){
   }
 }
 
+/**
+ * getDecimal
+ * 
+ * Gets string hex_string, discards whitespace characters until first 
+ * non-whitespace character
+ * 
+ * @param string hex_string
+ * @returns integer value
+*/
 uint32_t Process::getDecimal(std::string hex_string){
   return std::stoul(hex_string, nullptr, 16);
 }
 
 // TODO doxygen style comment
 // Get a functional of the respective command
-// return type is std::function<bool(std::vector<std::string>)>
+//std::function<bool(std::vector<std::string>)>
+/**
+ * getCommandFunction
+ * 
+ *  
+ * 
+ * @param string hex_string
+ * @returns sequence of integer values
+*/
+
 auto Process::getCommandFunction(std::string command_type){
 
   // Helper lambdas to process the required command
 
-  // TODO implement max memory
+    
+  /**
+  * memsize
+  * 
+  *  Sets the size of the virtual memmory to be used
+  * 
+  * @param string vector
+  * @returns boolean
+  */
+  // TODO implement max memory. DONE
   auto memsize = [this](std::vector<std::string> args) -> bool{
                    uint32_t mem_amount = getDecimal(args[0]);
+                   if (mem_amount > max_memory){
+                       return(false);
+                   }
                    std::vector<uint8_t> newMem(mem_amount,0);
                    this->mem_ref=newMem;
                    return(true);
                  };
 
+  /**
+  * cmp
+  * 
+  *  Compares a given number of bytes starting at two different addresses
+  * 
+  * @param string vector
+  * @returns boolean
+  */
   // TODO finish implementation,
   // Need to validate comparison vector.
-  auto cmp     = [this](std::vector<std::string> args) -> bool{
+  auto cmp = [this](std::vector<std::string> args) -> bool{
                    uint32_t addr1 = getDecimal(args[0]);
                    uint32_t addr2 = getDecimal(args[2]);
                    uint32_t count = getDecimal(args[3]);
@@ -87,24 +133,42 @@ auto Process::getCommandFunction(std::string command_type){
                    return true;
                  };
 
+  /**
+  * set
+  * 
+  *  Assigns given values starting at a given address
+  * 
+  * @param string vector
+  * @returns boolean
+  */
   // TODO roxygen comment
-  auto set     = [this](std::vector<std::string> args) -> bool{
+  auto set = [this](std::vector<std::string> args) -> bool{
                    uint32_t addr = getDecimal(args[0]);
                    std::vector<uint8_t> values_decimal(args.size()-2);
-                   std::transform(args.begin()+2,
-                                  args.end(),
-                                  values_decimal.begin(),
-                                  [this](std::string value_hex){return getDecimal(value_hex);});
+                   std::transform(args.begin()+2, args.end(),
+                           values_decimal.begin(), 
+                           [this](std::string value_hex){
+                                      return getDecimal(value_hex);
+                                  });
 
-                   std::transform(values_decimal.begin(),
-                                  values_decimal.end(),
-                                  mem_ref.begin()+addr,
-                                  [](uint8_t value_decimal){return value_decimal;});
+                   std::transform(values_decimal.begin(), values_decimal.end(),
+                                  mem_ref.begin()+addr, [](
+                                  uint8_t value_decimal){
+                                      return value_decimal;
+                                  });
                    return(true);
                  };
 
+  /**
+  * fill
+  * 
+  *  Assigns given value to a given number of bytes starting at a given address
+  * 
+  * @param string vector
+  * @returns boolean
+  */
   // TODO roxygen comment
-  auto fill    = [this](std::vector<std::string> args) -> bool{
+  auto fill = [this](std::vector<std::string> args) -> bool{
                    uint32_t addr = getDecimal(args[0]);
                    uint8_t value = getDecimal(args[2]);
                    uint32_t count = getDecimal(args[3]);
@@ -117,9 +181,18 @@ auto Process::getCommandFunction(std::string command_type){
                    return(true);
                  };
 
+  /**
+  * dup_
+  * 
+  *  Duplicates given number of values at a source address to a destination
+  *  address
+  * 
+  * @param string vector
+  * @returns boolean
+  */
   // TODO roxygen comment
   // dup is already a command in the namespace, changed to dup_
-  auto dup_    = [this](std::vector<std::string> args) -> bool{
+  auto dup_ = [this](std::vector<std::string> args) -> bool{
                    uint32_t src_addr = getDecimal(args[0]);
                    uint32_t dest_addr = getDecimal(args[2]);
                    uint32_t count = getDecimal(args[3]);
@@ -131,9 +204,16 @@ auto Process::getCommandFunction(std::string command_type){
 
                    return(true);
                  };
-
+  /**
+  * print
+  * 
+  *  Prints a given number of bytes at a given address
+  * 
+  * @param string vector
+  * @returns boolean
+  */
   // TODO roxygen comment
-  auto print   = [this](std::vector<std::string> args) -> bool{
+  auto print = [this](std::vector<std::string> args) -> bool{
                    uint32_t addr = getDecimal(args[0]);
                    uint32_t count = getDecimal(args[2]);
                    uint32_t elements_printed = 0;
@@ -191,7 +271,13 @@ auto Process::getCommandFunction(std::string command_type){
   return(functMap[command_type]);
 }
 
-
+/**
+  * Exec()
+  * 
+  *  Uses class variable file_name, reads each line and executes the appropriate
+  *  commands. Writes commands and output to file.
+  * 
+  */
 void Process::Exec(){
 
   std::string              command_string;
@@ -218,7 +304,15 @@ void Process::Exec(){
   }
 }
 
-
+/**
+  * getArguments
+  * 
+  *  Parses the lines read from file and extracts the different tokens that 
+  *  compose it.
+  * 
+  * @param string
+  * @returns string vector
+  */
 std::vector<std::string> Process::getArguments(std::string command){
   std::vector<std::string> tokens;
   std::vector<std::string> clean_tokens;
@@ -233,6 +327,25 @@ std::vector<std::string> Process::getArguments(std::string command){
   return clean_tokens;
 }
 
+/**
+  * Destructor
+  * 
+  *  Closes the file at the end of the program
+  * 
+  */
+virtual Process::~Process() {
+    process_file.close();
+}
+
+/**
+  * isCode
+  * 
+  *  Checks the first character in a line to verify is it is an empty line,
+  *  a comment or an instruction.
+  * 
+  * @param pointer
+  * @returns boolean
+  */
 // Check for comments or empty lines
 bool Process::isCode(char *firstCharacter){
   if(!std::strncmp("*", firstCharacter, 1) ||

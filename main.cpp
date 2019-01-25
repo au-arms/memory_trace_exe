@@ -13,14 +13,22 @@
 
 #include "Process.h"
 #include <cstdlib>
+#include <iostream>
 
 using namespace std;
 
 /*
  * 
  */
-int main(int argc, char** argv) {
-  Process test("TEST");
+int main(int argc, char** argv[]) {
+    
+    // Check argument
+    //if(argc != 2) {
+    //    cerr << "usage: Lab2 file_name\n";
+    //    exit(1);
+    //}
+    
+  Process test(argv[1]);
   test.Exec();
   return 0;
 }
