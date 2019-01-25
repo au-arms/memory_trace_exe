@@ -10,10 +10,7 @@
 #include <iomanip>
 #include <stdint.h>
 
-//Constructor
-//instantiates the process_file private variable
 //Opens the file name passed to it
-//TODO full doxygen comment
 /**
  * Constructor
  * 
@@ -32,8 +29,7 @@ Process::Process(const std::string &file_name){
 /**
  * getDecimal
  * 
- * Gets string hex_string, discards whitespace characters until first 
- * non-whitespace character
+ * Gets string hex_string & converts it to integer decimal.
  * 
  * @param string hex_string
  * @returns integer value
@@ -42,13 +38,13 @@ uint32_t Process::getDecimal(std::string hex_string){
   return std::stoul(hex_string, nullptr, 16);
 }
 
-// TODO doxygen style comment
 // Get a functional of the respective command
 //std::function<bool(std::vector<std::string>)>
 /**
  * getCommandFunction
  * 
- *  
+ * Get a functional of the command that is represented by
+ * the command_type string.
  * 
  * @param string hex_string
  * @returns sequence of integer values
@@ -58,7 +54,6 @@ auto Process::getCommandFunction(std::string command_type){
 
   // Helper lambdas to process the required command
 
-    
   /**
   * memsize
   * 
@@ -67,7 +62,6 @@ auto Process::getCommandFunction(std::string command_type){
   * @param string vector
   * @returns boolean
   */
-  // TODO implement max memory. DONE
   auto memsize = [this](std::vector<std::string> args) -> bool{
                    uint32_t mem_amount = getDecimal(args[0]);
                    if (mem_amount > max_memory){
@@ -86,8 +80,6 @@ auto Process::getCommandFunction(std::string command_type){
   * @param string vector
   * @returns boolean
   */
-  // TODO finish implementation,
-  // Need to validate comparison vector.
   auto cmp = [this](std::vector<std::string> args) -> bool{
                    uint32_t addr1 = getDecimal(args[0]);
                    uint32_t addr2 = getDecimal(args[2]);
@@ -141,7 +133,6 @@ auto Process::getCommandFunction(std::string command_type){
   * @param string vector
   * @returns boolean
   */
-  // TODO roxygen comment
   auto set = [this](std::vector<std::string> args) -> bool{
                    uint32_t addr = getDecimal(args[0]);
                    std::vector<uint8_t> values_decimal(args.size()-2);
@@ -167,7 +158,6 @@ auto Process::getCommandFunction(std::string command_type){
   * @param string vector
   * @returns boolean
   */
-  // TODO roxygen comment
   auto fill = [this](std::vector<std::string> args) -> bool{
                    uint32_t addr = getDecimal(args[0]);
                    uint8_t value = getDecimal(args[2]);
@@ -190,7 +180,6 @@ auto Process::getCommandFunction(std::string command_type){
   * @param string vector
   * @returns boolean
   */
-  // TODO roxygen comment
   // dup is already a command in the namespace, changed to dup_
   auto dup_ = [this](std::vector<std::string> args) -> bool{
                    uint32_t src_addr = getDecimal(args[0]);
@@ -212,7 +201,6 @@ auto Process::getCommandFunction(std::string command_type){
   * @param string vector
   * @returns boolean
   */
-  // TODO roxygen comment
   auto print = [this](std::vector<std::string> args) -> bool{
                    uint32_t addr = getDecimal(args[0]);
                    uint32_t count = getDecimal(args[2]);
