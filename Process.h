@@ -7,6 +7,17 @@
 #include <fstream>
 #include <functional>
 
+
+/**
+* Process
+* 
+* Reads trace file and extracts commands from multiple lines and executes the
+* proper command for each line. Writes to file the lines of the trace file with
+* command line numbers, the line read from the file and the proper output.
+* 
+* @param file_name input file
+* @throws std::runtime_error if file not found or error reading file
+*/
 class Process {
 public:
     
