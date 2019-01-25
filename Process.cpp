@@ -10,12 +10,6 @@
 #include <iomanip>
 #include <stdint.h>
 
-//Using boost for string splitting,
-//Used for parsing input to get commands
-#include <boost/algorithm/string.hpp>
-
-
-
 //Constructor
 //instantiates the process_file private variable
 //Opens the file name passed to it
@@ -31,8 +25,9 @@ uint32_t Process::getDecimal(std::string hex_string){
   return std::stoul(hex_string, nullptr, 16);
 }
 
+// TODO doxygen style comment
 // Get a functional of the respective command
-//std::function<bool(std::vector<std::string>)>
+// return type is std::function<bool(std::vector<std::string>)>
 auto Process::getCommandFunction(std::string command_type){
 
   // Helper lambdas to process the required command
@@ -227,10 +222,14 @@ void Process::Exec(){
 std::vector<std::string> Process::getArguments(std::string command){
   std::vector<std::string> tokens;
   std::vector<std::string> clean_tokens;
-  boost::split(tokens, command, [](char c){return c == ' ';});
-  for(auto const& token: tokens){
+  std::string token;
+
+  while(token != command){
+    token = command.substr(0,command.find_first_of(" "));
+    command = command.substr(command.find_first_of(" ") + 1);
     if(!token.empty()){clean_tokens.push_back(token);};
-  };
+  }
+
   return clean_tokens;
 }
 
